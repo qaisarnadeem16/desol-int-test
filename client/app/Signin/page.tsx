@@ -18,7 +18,7 @@ export default function Home() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/api/login', {
+      const response = await axios.post('https://desol-int-test-server.vercel.app/api/login', {
         email,
         password
       });

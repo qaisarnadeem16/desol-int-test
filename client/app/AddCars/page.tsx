@@ -90,7 +90,7 @@ const CarForm = () => {
     });
 
     try {
-      await axios.post('http://localhost:8000/api/addCar', {
+      await axios.post('https://desol-int-test-server.vercel.app/api/addCar', {
         userId: localStorage.getItem('id'),
         formData: formData,
         pictures: uploadedPictures
