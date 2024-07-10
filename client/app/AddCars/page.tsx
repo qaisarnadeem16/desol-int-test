@@ -1,5 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { storage } from '../../lib/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -25,8 +26,14 @@ const CarForm = () => {
     pictures: [],
   };
   const [formData, setFormData] = useState<FormData>(initialFormData);
-
   const [uploadedPictures, setUploadedPictures] = useState<string[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setUserId(localStorage.getItem('id'));
+    }
+  }, []);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -91,7 +98,7 @@ const CarForm = () => {
 
     try {
       await axios.post('https://desol-int-test-server.vercel.app/api/addCar', {
-        userId: localStorage.getItem('id'),
+        userId: userId,
         formData: formData,
         pictures: uploadedPictures
       });
@@ -100,20 +107,18 @@ const CarForm = () => {
       toast.success("Car Data Saved Successfully")
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.success("Error Uploading Data")
-
+      toast.error("Error Uploading Data")
     }
   };
 
   return (
-    <div className="flex flex-wrap  justify-between lg:min-h-screen  w-full">
+    <div className="flex flex-wrap justify-between lg:min-h-screen w-full">
       <section className="relative lg:w-1/2 min-h-screen w-full lg:flex hidden h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full">
         <Image
           alt=""
           src={img}
           className="absolute inset-0 h-full w-full object-cover opacity-80"
         />
-
       </section>
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 lg:w-1/2 w-full md:flex block items-center justify-center text-black">
@@ -207,6 +212,7 @@ const CarForm = () => {
                   <img src={url} alt={`Uploaded Picture ${index + 1}`} className="w-full h-20 object-contain rounded-md" />
                   <button
                     onClick={() => handleDeletePicture(url)}
+                    type="button"
                     className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <FaTrash className="text-2xl" />
@@ -221,8 +227,6 @@ const CarForm = () => {
             </button>
           </div>
         </form>
-
-
       </div>
     </div>
   );
